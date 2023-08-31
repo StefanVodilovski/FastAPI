@@ -1,5 +1,6 @@
 
 from typing import List, Optional
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from .. import models,schemas,oAuth2
@@ -11,23 +12,30 @@ router = APIRouter(
     tags=['Posts']
 )
 
-@router.get("/", response_model=List[schemas.PostResponse])
+@router.get("/", response_model = List[schemas.PostJoin])
 async def get_all_posts(db: Session = Depends(get_db), user_id: int = Depends(oAuth2.get_current_user), limit: int = 10,
                         search: Optional[str] = "",skip : int = 0 ):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    #  db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     
-    if posts is None:
+    posts = db.query(models.Post, func.count(models.Votes.posts_id).label("votes")).join(models.Votes, models.Votes.posts_id == models.Post.id, isouter= True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    
+    if not posts:
         raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail= "db is empty ")
     
+    # response_data = [
+    #     {"post": post, "votes": votes} for post, votes in posts
+    # ]
+
     return posts
 
-@router.get("/{id}", response_model=schemas.PostResponse)
+@router.get("/{id}", response_model=schemas.PostJoin)
 async def get_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * FROM posts where id = %s""", (str(id),))
     # post = cursor.fetchone()
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = db.query(models.Post, func.count(models.Votes.users_id).
+                     label('votes')).join(models.Votes, models.Votes.posts_id == models.Post.id,isouter= True).group_by(models.Post.id).filter(models.Post.id == id).first()
     
     if post is None:
         raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail= "no post with that id")
