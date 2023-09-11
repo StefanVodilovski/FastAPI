@@ -1,4 +1,4 @@
-# A RESTful api for social media built with FastAPI
+# A RESTful api for a social media app built with FastAPI
 
 #### This API  has 4 routes
 
