@@ -1,0 +1,32 @@
+version: "3"
+services:
+  api:
+    build: .
+    depends_on:
+      - mysql
+    ports: 
+      - 8000:8000
+    volumes:
+      - ./:/usr/src/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload   
+    environment:
+      - DATABASE_HOSTNAME=mysql
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+
+  mysql:
+    image: mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: Viktorija1    
+      MYSQL_DATABASE: fastapi
+    volumes:
+      - mysql-db:/var/lib/mysql
+
+volumes:
+  mysql-db:
