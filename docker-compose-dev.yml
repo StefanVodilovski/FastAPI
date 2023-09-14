@@ -23,8 +23,8 @@ services:
     image: mysql
 
     environment:
-      MYSQL_ROOT_PASSWORD: Viktorija1    
-      MYSQL_DATABASE: fastapi
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}    
+      MYSQL_DATABASE: ${DATABASE_NAME}
     volumes:
       - mysql-db:/var/lib/mysql
 

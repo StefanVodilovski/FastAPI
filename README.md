@@ -18,7 +18,7 @@
 
  #### This route is about likes or vote system (like and disslike)
 
-# how to run locally
+# How to run locally
 First clone this repo by using following command
 ````
 
@@ -69,3 +69,4 @@ ACCESS_TOKEN_EXPIRE_MINUTES =
 
 ````
 where each field should have your custom values from the database and oauth2 key and algorithm.
+
